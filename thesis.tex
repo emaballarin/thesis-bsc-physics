@@ -860,7 +860,7 @@ Nel corso dell'allenamento del modello sin qui descritto, un singolo \textit{tra
 	\item Il medesimo classificatore viene attaccato con un attacco prefissato -- su ciascun elemento dell'insieme adoperato per il calcolo dell'accuratezza -- e viene calcolata la \textit{empirical global robustness} $\mathfrak{R}$ così ottenuta;
 	\item Viene calcolato il vettore delle stime di \textit{accuratezza} e \textit{global adversarial robustness} $(\hat{\mathfrak{A}},\hat{\mathfrak{R}}) = \mathcal{V}(\boldsymbol{\theta})$;
 	\item È eseguito l'\textit{update} dei pesi di $\mathcal{V}$ sulla base di una metrica di similarità tra $(\hat{\mathfrak{A}},\hat{\mathfrak{R}})$ e $({\mathfrak{A}},{\mathfrak{R}})$
-	\item È eseguito l'\textit{update} dei pesi di $\mathcal{G}$ usando come \textit{loss} una funzione della forma $\mathcal{L}(\boldsymbol{\theta}) =  \alpha \hat{\mathfrak{A}}(\boldsymbol{\theta}) + \beta \hat{\mathfrak{R}}(\boldsymbol{\theta})$ dove $\alpha + \beta = 1$ (o una qualunque altra costante).
+	\item È eseguito l'\textit{update} dei pesi di $\mathcal{G}$ usando come \textit{loss} una funzione della forma $$\mathcal{L}(\boldsymbol{\theta}) =  -\alpha \hat{\mathfrak{A}}(\boldsymbol{\theta}) - \beta \hat{\mathfrak{R}}(\boldsymbol{\theta})$$ dove $\alpha + \beta = 1$ (o una qualunque altra costante).
 \end{enumerate}
 
 \subsubsection{Alta dimensionalità di $\boldsymbol{\theta}$ e \textit{pretraining}}
@@ -906,7 +906,7 @@ Questo, tuttavia, non ha impedito di provare a testare quanto proposto su un \te
 
 \subsubsection{Il dataset: \textit{MNIST}}
 
-Il \textit{dataset} utilizzato per tale \textit{test run} è costituito da \textit{MNIST}. Si tratta della raccolta di $10000$ immagini in \textit{bianco e nero}, quadrate e di lato pari a $28$ pixel, raffiguranti le cifre arabe dallo $0$ al $9$ in diverse grafie.
+Il \textit{dataset} utilizzato per tale \textit{test run} è costituito da \textit{MNIST}. Si tratta della raccolta di $10000$ immagini in \textit{bianco e nero}, quadrate e di lato pari a $28$ pixel, raffiguranti le cifre arabe dallo $0$ al $9$ in diverse grafie manoscritte.
 
 Lo scopo di un eventuale classificatore per tale problema consiste nell'associare ciascuna immagine al corretto \textit{one-hot vector} corrispondente alla rappresentazione di ciascuna cifra.
 

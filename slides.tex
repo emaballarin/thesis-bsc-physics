@@ -52,6 +52,7 @@
 
 % TYPESETTING SUGAR
 \DeclareMathOperator*{\argmax}{argmax}
+\DeclareMathOperator*{\argmin}{argmin}
 \DeclareMathOperator*{\Find}{Find}
 \DeclareMathOperator*{\find}{find}
 \DeclareMathOperator*{\NNet}{NNet}
@@ -180,7 +181,7 @@
 
 
 	\begin{block}{Questo è equivalente al problema di \alert{ottimizzazione}:}
-		$$\Find \boldsymbol{\tilde{w}} = \argmax_{\boldsymbol{w}}\left(\mathcal{L}\left(\mathcal{C}_{\boldsymbol{w}, \boldsymbol{h}}, \mathcal{T}\right)\right)$$
+		$$\Find \boldsymbol{\tilde{w}} = \argmin_{\boldsymbol{w}}\left(\mathcal{L}\left(\mathcal{C}_{\boldsymbol{w}, \boldsymbol{h}}, \mathcal{T}\right)\right)$$
 	\end{block}
 	%-----------------------------------------%
 \end{frame}
@@ -415,17 +416,17 @@
 	\hfill\break
 
 	Dato $\tilde{\boldsymbol{x}} \in \mathbb{I}$ di corretta classificazione e fissato $\alert{\epsilon}$, \textbf{iterativamente}:
-	\begin{itemize}
+	\begin{enumerate}
 		\item {Ci si pone in $\tilde{\boldsymbol{x}}$ o in qualunque altro punto della palla chiusa $\mathcal{B}_{\alert{\epsilon}}{(\tilde{\boldsymbol{x}})}$ };
 		\item { Si effettua un \textit{update step}: $\boldsymbol{x'} \leftarrow \boldsymbol{x} + {\eta} \nabla_{\boldsymbol{x}}\mathcal{L}\left(\mathcal{C}_{\boldsymbol{w}, \boldsymbol{h}}{\left({\boldsymbol{x}}\right)}\right)$; $\eta \ll 1$ };
 		\item{ Qualora $\boldsymbol{x'}$ $\notin$  $\mathcal{B}_{{\epsilon}}{(\tilde{\boldsymbol{x}})}$, lo si proietta sulla sfera $\mathcal{S}_{{\epsilon}}{(\tilde{\boldsymbol{x}})}$ }.
-	\end{itemize}
+	\end{enumerate}
 
 
 
 
 	\begin{block}{È equivalente al problema di ottimizzazione:}
-		$$\Find \boldsymbol{x}' = \argmax_{\alert{\boldsymbol{x}} \in \mathcal{B}_{\alert{\epsilon}}{(\tilde{\boldsymbol{x}})}}\left(-\mathcal{L}\left(\mathcal{C}_{\boldsymbol{w}, \boldsymbol{h}}{\left(\alert{\boldsymbol{x}}\right)}\right)\right)$$
+		$$\Find \boldsymbol{x}' = \argmin_{\alert{\boldsymbol{x}} \in \mathcal{B}_{\alert{\epsilon}}{(\tilde{\boldsymbol{x}})}}\left(-\mathcal{L}\left(\mathcal{C}_{\boldsymbol{w}, \boldsymbol{h}}{\left(\alert{\boldsymbol{x}}\right)}\right)\right)$$
 	\end{block}
 \hfill\break
 Le metriche scelte devono essere quelle indotte da ${||\cdot||}_{\infty}$.
@@ -488,7 +489,17 @@ Le metriche scelte devono essere quelle indotte da ${||\cdot||}_{\infty}$.
 %% SLIDE 3.2:
 \begin{frame}
 	\frametitle{Generatore $\mathcal{G}$ e \textit{value network} $\mathcal{V}$}
-	SLIDE 3.2
+	Un riassunto della dinamica di \textit{training}:
+	\hfill\break
+
+	\begin{enumerate}
+		\item \textbf{Campionamento}: $\boldsymbol{s} \sim \text{Dist}^{z}$ nota;
+		\item Generazione dei pesi:  $\boldsymbol{\theta} = \mathcal{G}(\boldsymbol{s})$ e \textit{weight-loading};
+		\item Computo di \textit{accuratezza} $\mathfrak{A}$ e \textit{robustezza} $\mathfrak{R}$ su $\tilde{T} \subseteq \mathcal{T}$;
+		\item \textbf{Stima} di \textit{accuratezza} e \textit{robustezza} tramite $(\hat{\mathfrak{A}},\hat{\mathfrak{R}}) = \mathcal{V}(\boldsymbol{\theta})$;
+		\item \textit{Training step} per $\mathcal{V}$: $\mathcal{L}_{\mathcal{V}} = $ similarità tra $(\hat{\mathfrak{A}},\hat{\mathfrak{R}})$ e $({\mathfrak{A}},{\mathfrak{R}})$
+		\item \textit{Training step} $\mathcal{G}$: $\mathcal{L}(\boldsymbol{\theta}) =  -\alpha \alert{\hat{\mathfrak{A}}}(\boldsymbol{\theta}) - \beta \alert{\hat{\mathfrak{R}}}(\boldsymbol{\theta}) \ \text{t.c.}\ \alpha + \beta = 1$.
+	\end{enumerate}
 \end{frame}
 
 %---------------------------------------------%
@@ -496,7 +507,24 @@ Le metriche scelte devono essere quelle indotte da ${||\cdot||}_{\infty}$.
 %% SLIDE 3.3:
 \begin{frame}
 	\frametitle{\textit{Where's the catch?}}
-	SLIDE 3.3
+	In fase d'ideazione e sviluppo sono stati incontrati alcuni ostacoli che hanno richiesto soluzioni specifiche:
+	\hfill\break
+
+	\begin{itemize}
+		\item Non-differenziabilità del \textit{weight-loading} $\rightarrow$ Uso di un \textit{value network} $\mathcal{V}$;
+		\item Lentezza nella convergenza (a causa di $\mathcal{V}$ e non solo) $\rightarrow$ \textit{pretraining};
+	\end{itemize}
+	\hfill\break
+
+	E alcune scelte sofferte ma necessarie:
+	\hfill\break
+
+	\begin{itemize}
+		\item Volontà di preservare informazioni distribuzionali riguardo ai \textit{pesi} $\rightarrow$ Impossibilità di usare \textit{regolarizzazioni};
+	\end{itemize}
+	\hfill\break
+
+
 \end{frame}
 
 }
@@ -511,7 +539,16 @@ Le metriche scelte devono essere quelle indotte da ${||\cdot||}_{\infty}$.
 %% SLIDE 4.1:
 \begin{frame}
 	\frametitle{Il dataset: \textit{MNIST}}
-	SLIDE 4.1
+	Raccolta di $10000$ immagini in \textit{bianco e nero}, quadrate, $28 \times 28$ pixel. Rappresentate come vettore binario dei $784$ pixel.
+	\hfill\break
+
+	Contiene raffigurazioni delle cifre arabe $0-9$ in diverse grafie manoscritte, con annessa classificazione in base alle intenzioni dello scrivente.
+	\hfill\break
+
+	Tipico problema di classificazione: uno standard \textit{de facto} per \textit{toy-problems} in \textit{Machine Learning}. Oggi di facile risoluzione quanto all'accuratezza del modello appreso.
+	\hfill\break
+
+	\center \includegraphics[height=0.18\linewidth]{mnist-sample-four.png}
 \end{frame}
 
 	%---------------------------------------------%
@@ -519,7 +556,9 @@ Le metriche scelte devono essere quelle indotte da ${||\cdot||}_{\infty}$.
 %% SLIDE 4.2:
 \begin{frame}
 	\frametitle{Classificatore (\textit{LeNet-5}) e attacco (\textit{PGD-${||\cdot||}_{\infty}$)}}
-	SLIDE 3.2
+	\textit{LeNet5} (LeCun, Bottou et al.) è un'architettura neurale \textit{convoluzionale} e {fully-connected} pensata appositamente per la classificazione di cifre arabe manoscritte. Nel caso in esame è semplicemente stato ridotto per praticità il numero di \textit{pesi}.
+	\hfill\break
+	\center \includegraphics[height=0.40\linewidth]{mnist-adv-pgdlinf.png}
 \end{frame}
 
 %---------------------------------------------%
@@ -539,7 +578,21 @@ Le metriche scelte devono essere quelle indotte da ${||\cdot||}_{\infty}$.
 %% SLIDE 4.3:
 \begin{frame}
 	\frametitle{Conclusioni}
-	SLIDE 4.4
+	Alcuni dei risultati evidenziati si configurano come notevoli e interessanti. Il percorso proposto è sicuramente meritevole di ulteriori \alert{approfondimenti}. L'ambito è ancora troppo poco esplorato!
+
+	\hfill\break
+	Possibili sviluppi ulteriori:
+	\begin{itemize}
+		\item{Determinazione delle condizioni rigorose di convergenza del modello;}
+		\item{Studio dei campioni con migliore profilo \textit{acc/rob};}
+		\item{Ottimizzazione multi-obiettivo nel \textit{latent space};}
+		\item{Misure di \textit{acc/rob} differenziabili e ablazione di $\mathcal{V}$;}
+		\item{Robustezza \textit{multi-attacco} e \textit{multi-norma};}
+	\hfill\break
+		\item{Robustezza \textit{weight-agnostic};}
+		\item{Approccio \textit{neuro-inspired}/\textit{active learning} alla robustezza;}
+	\end{itemize}
+
 \end{frame}
 
 %% THANKS!
